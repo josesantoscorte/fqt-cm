@@ -1,0 +1,36 @@
+services:
+
+  postgres-database:
+    image: postgres:latest
+    container_name: postgres-database
+    environment:
+      POSTGRES_USER: db
+      POSTGRES_PASSWORD: db
+      POSTGRES_DB: db
+    volumes:
+      - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql
+    tmpfs:
+      - /var/lib/postgresql/data  
+    networks:
+      - app-network
+    ports:
+      - "5432:5432"
+
+  flask-server:
+    build:
+      context: ./server
+    container_name: flask-server
+    environment:
+      FLASK_APP: src/app.py
+      DATABASE_URL: postgres://db:db@postgres-database:5432/db
+      JWT_SECRET_KEY: e4b9d7a4f3c8e2a7d1b6c5f8e9a3d7f4b2c1e8f6a9d3c7e5a4f2b1d6c8e9f3a
+    volumes:
+      - ./server:/app
+    networks:
+      - app-network
+    ports:
+      - "8000:8000"
+
+networks:
+  app-network:
+    driver: bridge
