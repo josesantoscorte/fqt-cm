@@ -80,7 +80,7 @@ def login():
     with get_connection() as conn:
         with conn.cursor() as cur:
             cur.execute(GET_PASSWORD, (username,))  
-            stored_password = cur.fetchone()
+            stored_password = cur.fetchone()['password']
     
     # Check if the user exists
     if not stored_password:

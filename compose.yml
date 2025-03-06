@@ -25,7 +25,7 @@ services:
       context: ./server
 
     environment:
-      FLASK_APP: src/app.py
+      FLASK_APP: src/main.py
       DATABASE_URL: postgres://db:db@database:5432/db
       JWT_SECRET_KEY: e4b9d7a4f3c8e2a7d1b6c5f8e9a3d7f4b2c1e8f6a9d3c7e5a4f2b1d6c8e9f3a
       REGISTER_RATE_LIMITS: 5/minute;10/hour;20/day
