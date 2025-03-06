@@ -1,5 +1,3 @@
-# Cryptographic functions for the server
-
 import os
 import hashlib
 
