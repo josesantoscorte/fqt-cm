@@ -3,8 +3,7 @@ from flask_jwt_extended import JWTManager, create_access_token, jwt_required, ge
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 
-from database import get_connection
-from database import INSERT_USER, GET_PASSWORD
+from database import get_connection, INSERT_USER, GET_PASSWORD
 from crypto import hash_password, verify_password
 from environment import get_jwt_secret, get_login_rate_limits, get_register_rate_limits
 
@@ -22,14 +21,13 @@ limiter.init_app(app)
 # Error handler for rate limits
 @app.errorhandler(429)
 def ratelimit_error(e):
+    """Endpoint for handling rate limit errors."""
     return jsonify({"error": "Too many requests. Please try again later."}), 429
 
 @app.post("/api/register")
 @limiter.limit(get_register_rate_limits())
 def register():
-    """
-    Endpoint for registering a new user
-    """
+    """Endpoint for registering a new user."""
     
     # Get the data from the request
     data = request.json
@@ -57,9 +55,7 @@ def register():
 @app.post("/api/login")
 @limiter.limit(get_login_rate_limits())
 def login():
-    """
-    Endpoint for logging in a user
-    """
+    """Endpoint for logging in a user."""
     
     # Get the data from the request
     data = request.json
@@ -95,5 +91,5 @@ def login():
 @app.get("/api/protected")
 @jwt_required()
 def protected():
-    current_user = get_jwt_identity()
-    return jsonify(logged_in_as=current_user), 200
+    """Endpoint for testing protected routes."""
+    return jsonify(logged_in_as=get_jwt_identity()), 200
