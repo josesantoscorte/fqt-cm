@@ -14,3 +14,6 @@ INSERT INTO users (username, password) VALUES (%s, %s)
 GET_PASSWORD = """
 SELECT password FROM users WHERE username = %s
 """
+UPDATE_PASSWORD = """
+UPDATE users SET password = %s WHERE username = %s
+"""

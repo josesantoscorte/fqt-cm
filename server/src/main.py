@@ -3,7 +3,7 @@ from flask_jwt_extended import JWTManager, create_access_token, jwt_required, ge
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 
-from database import get_connection, INSERT_USER, GET_PASSWORD
+from database import get_connection, INSERT_USER, GET_PASSWORD, UPDATE_PASSWORD
 from crypto import hash_password, verify_password
 from environment import get_jwt_secret, get_login_rate_limits, get_register_rate_limits
 
@@ -18,7 +18,6 @@ jwt = JWTManager(app)
 limiter = Limiter(key_func=get_remote_address)
 limiter.init_app(app)
 
-# Error handler for rate limits
 @app.errorhandler(429)
 def ratelimit_error(e):
     """Endpoint for handling rate limit errors."""
@@ -50,7 +49,7 @@ def register():
             cur.execute(INSERT_USER, (username, hash_password(password)))
             conn.commit()
             
-    return jsonify({"message": "User registered successfully"}), 200
+    return jsonify({"success": "User registered successfully"}), 200
 
 @app.post("/api/login")
 @limiter.limit(get_login_rate_limits())
@@ -87,6 +86,34 @@ def login():
         return jsonify({"error": "Incorrect password."}), 501
     
     return jsonify(access_token=create_access_token(identity=username)), 200
+
+@app.post("/api/changePassword")
+@jwt_required()
+def change_password():
+    """Endpoint for changing a user's password."""
+    
+    # Get the data from the request
+    data = request.json
+    if not data:
+        return jsonify({"error": "Missing data."}), 400
+    
+    # Check if the data is valid
+    if not isinstance(data.get("password"), str):
+        return jsonify({"error": "Invalid password."}), 401
+    
+    # Parse the data
+    password = data["password"]
+    
+    # Get the username from the JWT
+    username = get_jwt_identity()
+    
+    # Update the user password in the database
+    with get_connection() as conn:
+        with conn.cursor() as cur:
+            cur.execute(UPDATE_PASSWORD, (hash_password(password), username))
+            conn.commit()
+    
+    return jsonify({"success": "Password changed successfully."}), 200
 
 @app.get("/api/protected")
 @jwt_required()
