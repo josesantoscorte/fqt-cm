@@ -1,5 +1,8 @@
 
-# FQT-CM Project
+# Authentication API 
+
+## ⚠️🚧 **WARNING** 🚧⚠️  
+This project is **not meant for production use**. It is still under development and serves as an **educational/example implementation**. Use with caution!
 
 ## Project Structure
 
